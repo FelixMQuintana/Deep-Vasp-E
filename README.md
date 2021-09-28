@@ -3,6 +3,7 @@
 
 ## GRAD++ CAM
 
+![visualization] (https://github.com/FelixMQuintana/Deep-Vasp-E/blob/main/TrypsinFigure_v2.png)
 
 ## Project structure
 ####Models
