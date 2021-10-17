@@ -82,7 +82,7 @@ def main(mode, super_family, working_directory, leave_out_index : int, res, gene
         lowest_loss = None
         best_model = None
         with device("/gpu:0"):
-            k_fold = KFold(n_splits=10, shuffle=True)
+            k_fold = KFold(n_splits=10, shuffle=True, random_state=1000)
             no_fold = 1
             test_scores = open('Test_Score_' + flatten_protein_list[leave_out_index] + "_neg.txt", "w")
             for train, test in k_fold.split(images_new, labels_new):
