@@ -8,7 +8,7 @@ import numpy as np
 from time import time
 from datetime import datetime
 from sklearn.model_selection import KFold
-from models.electrostatics_cnn_model import create_model
+from models import create_model
 from random import sample
 from processing.preprocessing import Preprocessing
 from processing.postprocessing import PostProcessing
