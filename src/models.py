@@ -5,43 +5,58 @@ import abc
 from src.load import FileGeneric, CNNFile
 from tensorflow import keras
 from logging import getLogger
-
 logger = getLogger(__name__)
-
 
 class Model(abc.ABC):
     """
 
     """
+    def __init__(self):
+        """
+
+        """
+        self.model = None
 
     @abc.abstractmethod
-    def __init__(self, *args) -> None:
+    def create_model(self, *args) -> None:
         """
 
         """
-        raise NotImplemented
-
-    @abc.abstractmethod
-    def train(self, train_data: list[FileGeneric], *args) -> None:
-        """
-
-        """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abc.abstractmethod
     def evaluate(self, test_data: list[FileGeneric], *args) -> list:
         """
 
         """
-        raise NotImplemented
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def load_model(self, filename: str) -> None:
+        """
+
+        """
+        raise NotImplementedError
 
 
-class ElectrostaticsModel(Model):
+class CNNModel(abc.ABC, Model):
+
+    @abc.abstractmethod
+    def train(self, train_data: list[FileGeneric], *args) -> None:
+        """
+
+        """
+        raise NotImplementedError
+
+
+class ElectrostaticsModel(CNNModel, Model):
     """
 
     """
+    def __init__(self):
+        super().__init__()
 
-    def __init__(self, x_dim_size, y_dim_size, z_dim_size):
+    def create_model(self, x_dim_size, y_dim_size, z_dim_size):
         logger.info("Creating model")
         model = keras.Sequential()
 
