@@ -24,7 +24,7 @@ class DeepVaspE:
         self._working_directory = working_directory
         self._evaluation_image = evaluation_image
         self._training: DataSet = DataSet([])
-        self._test_set: DataSet = DataSet([])
+        self._test: DataSet = DataSet([])
         self._model = ElectrostaticsModel()
         self._training_set_directory = None
         self._test_set_directory = None
@@ -41,11 +41,13 @@ class DeepVaspE:
 
         """
         for label in self._training_set_directory.iterdir():
-            for sample in label.iterdir():
-                self._training.set.append(CNNFile.load(sample))
-        for label in self._training_set_directory.iterdir():
-            for sample in label.iterdir():
-                self._test_set.set.append(CNNFile.load(sample))
+            for protein in label.iterdir():
+                for sample in protein.iterdir():
+                    self._training.set.append(CNNFile.load(sample, int(label.stem)))
+        for label in self._test_set_directory.iterdir():
+            for protein in label.iterdir():
+                for sample in protein.iterdir():
+                    self._test.set.append(CNNFile.load(sample, int(label.stem)))
 
     def train_model(self):
         pass

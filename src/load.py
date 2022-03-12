@@ -5,18 +5,18 @@ import numpy as np
 import re
 from logging import getLogger
 import abc
-from enum import IntEnum
+from enum import Enum
 from pathlib import Path
 
 logger = getLogger(__name__)
 
 
 @dataclass
-class VoxelResolution(IntEnum):
+class VoxelResolution:
     """
     Resolution dataclass
     """
-    resolution: int
+    resolution: float
 
 
 class LoadException(Exception):
@@ -85,7 +85,7 @@ class FileGeneric(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def load(filename: Path) -> DataGeneric:
+    def load(filename: Path, label: int) -> DataGeneric:
         """
         Loads data into an object of type Data
         :return: Data
@@ -158,7 +158,7 @@ class CNNFile(FileGeneric):
             cnn_file.close()
 
     @staticmethod
-    def load(file: Path) -> VoxelData:
+    def load(file: Path, label: int) -> VoxelData:
         """
         Loads voxel data and associated information into a voxelData object and returns it
         :return: VoxelData
@@ -169,6 +169,7 @@ class CNNFile(FileGeneric):
                 lines = voxel_file.readlines()
                 # Read dimensions from line 18
                 match = re.search(r'BOUNDS xyz dim: \[([0-9]+) ([0-9]+) ([0-9]+)]', lines[17])
+                resolution_match = re.search(r'BOUNDS resolution: \[([0-9]+.[0-9]+)]', lines[18])
                 match_x_bounds = re.search(r'BOUNDS xneg/xpos: \[-*([0-9]+.[0-9]+) -*([0-9]+.[0-9]+)]',
                                            lines[19])
                 x_neg, x_pos = match_x_bounds.groups()
@@ -190,8 +191,8 @@ class CNNFile(FileGeneric):
                     val = float(val)
                     data[line_num] = val
                 data = data.reshape((x_dim, y_dim, z_dim, 1))
-                return VoxelData(filepath=file.absolute(), label_index=int(file.parent.name), values=data,
-                                 resolution=VoxelResolution(int(file.parent.parent.as_posix())),
+                return VoxelData(filepath=file.absolute(), label_index=label, values=data,
+                                 resolution=VoxelResolution(float(resolution_match.group(1))),
                                  x_bounds=LatticeBounds(x_neg, x_pos), y_bounds=LatticeBounds(y_neg, y_neg),
                                  z_bounds=LatticeBounds(z_neg, z_pos),
                                  dimensions=ThreeDimensionalLattice(x_dim, y_dim, z_dim))
