@@ -11,10 +11,10 @@ from keras.backend import exp
 from src.load import DataGeneric, CNNFile, VoxelData
 from src.models import CNNModel
 from tensorflow import GradientTape
+from tensorflow.keras.models import Model
+from pathlib import Path
 
 logger = getLogger(__name__)
-from tensorflow.keras.models import Model
-from pathlib import PurePath
 
 
 @dataclasses.dataclass
@@ -71,7 +71,7 @@ class VoxelGradCam(VisualizationGeneric, NeuralNetwork):
         for index, w in enumerate(weights):
             values += w * outputs[:, :, :, index]
 
-        self.visual_data = VoxelData(filepath=PurePath('/DeepVasp-E/VoxelGradCam.CNN'), label_index=data.label_index,
+        self.visual_data = VoxelData(filepath=Path('/DeepVasp-E/VoxelGradCam.CNN'), label_index=data.label_index,
                                      values=values, resolution=data.resolution, x_bounds=data.x_bounds,
                                      y_bounds=data.y_bounds, z_bounds=data.z_bounds, dimensions=data.dimensions)
 

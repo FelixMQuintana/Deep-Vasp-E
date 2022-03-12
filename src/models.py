@@ -3,9 +3,8 @@
 """
 import abc
 import dataclasses
-
+import keras
 from src.load import DataGeneric, VoxelData
-from tensorflow import keras
 from logging import getLogger
 from tensorflow.keras.models import load_model
 logger = getLogger(__name__)
@@ -40,7 +39,7 @@ class Model(abc.ABC):
         raise NotImplementedError
 
 
-class CNNModel(abc.ABC, Model):
+class CNNModel(Model, abc.ABC):
 
     @abc.abstractmethod
     def train(self, train_data: list[DataGeneric], *args) -> None:
@@ -61,7 +60,7 @@ class ElectrostaticsModel(CNNModel, Model):
     def create_model(self, x_dim_size, y_dim_size, z_dim_size):
         logger.info("Creating model")
         self.model = keras.Sequential()
-        self.model.add(keras.layers.Conv3D(64,
+        self.model.add(keras. .Conv3D(64,
                                            kernel_size=(5, 5, 5),
                                            strides=(1, 1, 1),
                                            activation='relu',

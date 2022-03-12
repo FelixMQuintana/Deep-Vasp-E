@@ -6,7 +6,7 @@ import re
 from logging import getLogger
 import abc
 from enum import IntEnum
-from pathlib import PurePath
+from pathlib import Path
 
 logger = getLogger(__name__)
 
@@ -30,7 +30,7 @@ class DataGeneric(abc.ABC):
     """
     Data type
     """
-    filepath: PurePath
+    filepath: Path
     label_index: int
     values: np.ndarray
 
@@ -85,7 +85,7 @@ class FileGeneric(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def load(filename: str) -> DataGeneric:
+    def load(filename: Path) -> DataGeneric:
         """
         Loads data into an object of type Data
         :return: Data
@@ -158,14 +158,14 @@ class CNNFile(FileGeneric):
             cnn_file.close()
 
     @staticmethod
-    def load(filepath: str) -> VoxelData:
+    def load(file: Path) -> VoxelData:
         """
         Loads voxel data and associated information into a voxelData object and returns it
         :return: VoxelData
         """
         try:
-            path_obj = PurePath(filepath)
-            with open(path_obj.name, encoding='gbk', errors='ignore') as voxel_file:
+
+            with file.open(encoding='gbk', errors='ignore') as voxel_file:
                 lines = voxel_file.readlines()
                 # Read dimensions from line 18
                 match = re.search(r'BOUNDS xyz dim: \[([0-9]+) ([0-9]+) ([0-9]+)]', lines[17])
@@ -190,8 +190,8 @@ class CNNFile(FileGeneric):
                     val = float(val)
                     data[line_num] = val
                 data = data.reshape((x_dim, y_dim, z_dim, 1))
-                return VoxelData(filepath=path_obj, label_index=int(path_obj.parent.name), values=data,
-                                 resolution=VoxelResolution(int(path_obj.parent.parent.as_posix())),
+                return VoxelData(filepath=file.absolute(), label_index=int(file.parent.name), values=data,
+                                 resolution=VoxelResolution(int(file.parent.parent.as_posix())),
                                  x_bounds=LatticeBounds(x_neg, x_pos), y_bounds=LatticeBounds(y_neg, y_neg),
                                  z_bounds=LatticeBounds(z_neg, z_pos),
                                  dimensions=ThreeDimensionalLattice(x_dim, y_dim, z_dim))
