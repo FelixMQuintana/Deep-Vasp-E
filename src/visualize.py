@@ -13,6 +13,7 @@ from src.models import CNNModel
 from tensorflow import GradientTape
 from tensorflow.keras.models import Model
 from pathlib import Path
+from tensorflow.keras.models import Sequential
 
 logger = getLogger(__name__)
 
@@ -48,7 +49,7 @@ class VoxelGradCam(VisualizationGeneric, NeuralNetwork):
     """
     visual_data: VoxelData
 
-    def calculate_visual(self, data: VoxelData, model: CNNModel) -> None:
+    def calculate_visual(self, data: VoxelData, model: Sequential) -> None:
         """
 
         """

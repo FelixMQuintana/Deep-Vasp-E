@@ -3,10 +3,14 @@
 """
 import abc
 import dataclasses
-import keras
 from src.load import DataGeneric, VoxelData
 from logging import getLogger
 from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import layers
+from tensorflow.keras import losses
+
 logger = getLogger(__name__)
 
 
@@ -55,31 +59,30 @@ class ElectrostaticsModel(CNNModel, Model):
     """
 
     def __init__(self):
-        self.model = None
+        self.model: Sequential = Sequential()
 
     def create_model(self, x_dim_size, y_dim_size, z_dim_size):
         logger.info("Creating model")
-        self.model = keras.Sequential()
-        self.model.add(keras. .Conv3D(64,
-                                           kernel_size=(5, 5, 5),
-                                           strides=(1, 1, 1),
-                                           activation='relu',
-                                           input_shape=(x_dim_size,
-                                                        y_dim_size,
-                                                        z_dim_size,
-                                                        1),
-                                           padding="same"))
+        self.model.add(layers.Conv3D(64,
+                                     kernel_size=(5, 5, 5),
+                                     strides=(1, 1, 1),
+                                     activation='relu',
+                                     input_shape=(x_dim_size,
+                                                  y_dim_size,
+                                                  z_dim_size,
+                                                  1),
+                                     padding="same"))
         self.model.add(
-            keras.layers.Conv3D(64, kernel_size=(5, 5, 5), activation='relu', padding="same"))
-        self.model.add(keras.layers.MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2)))
-        self.model.add(keras.layers.Flatten())
-        self.model.add(keras.layers.Dense(128, activation='relu'))
-        self.model.add(keras.layers.Dense(3, activation='softmax'))
+            layers.Conv3D(64, kernel_size=(5, 5, 5), activation='relu', padding="same"))
+        self.model.add(layers.MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2)))
+        self.model.add(layers.Flatten())
+        self.model.add(layers.Dense(128, activation='relu'))
+        self.model.add(layers.Dense(3, activation='softmax'))
 
         self.model.summary()
 
-        self.model.compile(optimizer=keras.optimizers.SGD(lr=0.0007, momentum=0.9, decay=10 / 40000),
-                           loss=keras.losses.sparse_categorical_crossentropy,
+        self.model.compile(optimizer=SGD(lr=0.0007, momentum=0.9, decay=10 / 40000),
+                           loss=losses.sparse_categorical_crossentropy,
                            metrics=['accuracy'])
         logger.info("Created model")
 

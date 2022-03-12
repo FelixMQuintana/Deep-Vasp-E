@@ -11,8 +11,8 @@ class ProjectStructure(Enum):
 
 
 @dataclasses.dataclass
-class Training:
-    set: [VoxelData] = dataclasses.field(init=False)
+class DataSet:
+    set: [VoxelData]
 
 
 class DeepVaspE:
@@ -23,8 +23,8 @@ class DeepVaspE:
         """
         self._working_directory = working_directory
         self._evaluation_image = evaluation_image
-        self._training = Training()
-        self._test_set = []
+        self._training: DataSet = DataSet([])
+        self._test_set: DataSet = DataSet([])
         self._model = ElectrostaticsModel()
         self._training_set_directory = None
         self._test_set_directory = None
@@ -40,14 +40,12 @@ class DeepVaspE:
         """
 
         """
-     #   training = []
         for label in self._training_set_directory.iterdir():
             for sample in label.iterdir():
-                training.append(CNNFile.load(sample))
+                self._training.set.append(CNNFile.load(sample))
         for label in self._training_set_directory.iterdir():
-           for sample in label.iterdir():
-                self._test_set.append(CNNFile.load(sample))
-        self._training.set = training
+            for sample in label.iterdir():
+                self._test_set.set.append(CNNFile.load(sample))
 
     def train_model(self):
-        self._model.create_model(self._training.set[0])
+        pass
