@@ -95,14 +95,14 @@ class FileGeneric(abc.ABC):
 
 class CNNFile(FileGeneric):
     """
-
+    Responsible for writing and loading VoxelData. Object itself doesn't hold any data.
     """
 
     @staticmethod
     def write(data: VoxelData) -> None:
         """
-            Method is responsible for generating cnn file based on 3D numpy array data (raw_cnn_data) that has been sorted
-            from largest values to smallest. A threshold can be specified for top values of given ranged.
+            Method is responsible for generating cnn file based on VoxelData.values that's been sorted
+            from largest to smallest.
             :return: None
             """
         with open(VoxelData.filepath.name, 'w') as cnn_file:

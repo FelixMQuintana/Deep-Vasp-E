@@ -3,6 +3,7 @@
 """
 import abc
 import dataclasses
+from pathlib import Path
 from src.load import DataGeneric, VoxelData
 from logging import getLogger
 from tensorflow.keras.models import load_model
@@ -110,8 +111,8 @@ class ElectrostaticsModel(CNNModel, Model):
                                    labels,
                                    verbose=verbose)
 
-    def load_model(self, filename: str) -> None:
+    def load_model(self, filename: Path) -> None:
         """
 
         """
-        self.model = load_model(filename)
+        self.model = load_model(filename.stem)
