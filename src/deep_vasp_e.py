@@ -68,6 +68,8 @@ class DeepVaspE:
             for protein in label.iterdir():
                 for sample in protein.iterdir():
                     self._test.set.append(CNNFile.load(sample, int(label.stem)))
+        example: VoxelData = self._training.set[0]
+        self._model.create_model(example.dimensions.x_dim, example.dimensions.y_dim, example.dimensions.z_dim)
 
     def train_model(self) -> None:
         """
