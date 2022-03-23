@@ -1,5 +1,5 @@
 """
-
+Module is responsible for holding different types of models that this project can support
 """
 import abc
 import dataclasses
@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 @dataclasses.dataclass
 class Model(abc.ABC):
     """
-
+    Class is an abstract class providing structure on how models should be made. Models must contain a way to
     """
     model: object
 
@@ -30,7 +30,7 @@ class Model(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def evaluate(self, test_data: list[DataGeneric], *args) -> list:
+    def evaluate(self, test_data: [DataGeneric], *args) -> list:
         """
 
         """
@@ -44,10 +44,12 @@ class Model(abc.ABC):
         raise NotImplementedError
 
 
-class CNNModel(Model, abc.ABC):
+class CNNModel(abc.ABC):
+
+    model: Sequential
 
     @abc.abstractmethod
-    def train(self, train_data: list[DataGeneric], *args) -> None:
+    def train(self, train_data: [DataGeneric], *args) -> None:
         """
 
         """
@@ -56,13 +58,21 @@ class CNNModel(Model, abc.ABC):
 
 class ElectrostaticsModel(CNNModel, Model):
     """
-
+    Model is responsible for electrostatic voxel data.
     """
 
     def __init__(self):
-        self.model: Sequential = Sequential()
+        self.model: Sequential
 
-    def create_model(self, x_dim_size, y_dim_size, z_dim_size):
+    def create_model(self, x_dim_size: int, y_dim_size: int, z_dim_size:int) -> None:
+        """
+
+        """
+        if self.model is not None:
+            logger.info("Model has already been created.")
+            return
+        else:
+            self.model = Sequential()
         logger.info("Creating model")
         self.model.add(layers.Conv3D(64,
                                      kernel_size=(5, 5, 5),
@@ -87,7 +97,7 @@ class ElectrostaticsModel(CNNModel, Model):
                            metrics=['accuracy'])
         logger.info("Created model")
 
-    def train(self, training_files: list[VoxelData], batch_size: int = 256,
+    def train(self, training_files: [VoxelData], batch_size: int = 256,
               epochs: int = 10, validation_split: float = .2, verbose: int = 2) -> None:
         """
 
@@ -100,7 +110,7 @@ class ElectrostaticsModel(CNNModel, Model):
                        batch_size=batch_size, epochs=epochs,
                        validation_split=validation_split, verbose=verbose)
 
-    def evaluate(self, test_files: list[VoxelData], verbose=2) -> list:
+    def evaluate(self, test_files: [VoxelData], verbose=2) -> list:
         """
 
         """

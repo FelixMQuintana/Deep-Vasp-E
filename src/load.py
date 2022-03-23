@@ -29,6 +29,10 @@ class LoadException(Exception):
 class DataGeneric(abc.ABC):
     """
     Data type
+
+    :param filepath: filepath for the DataGeneric
+    :param label_index: An integer representation of the label of the given data.
+    (I.E, 1, 2, or 3 for a three class problem)
     """
     filepath: Path
     label_index: int
@@ -37,6 +41,13 @@ class DataGeneric(abc.ABC):
 
 @dataclass
 class ThreeDimensionalLattice:
+    """
+
+    :param x_dim: integer value representing the dimension size of x
+    :param y_dim: integer value representing the dimension size of y
+    :param z_dim: integer value representing the dimension size of z
+
+    """
     x_dim: int
     y_dim: int
     z_dim: int
@@ -44,6 +55,14 @@ class ThreeDimensionalLattice:
 
 @dataclass
 class LatticeBounds:
+    """
+    Class to hold bounds of a dimension( i.e Cartesian)
+
+    :param bound_neg: integer holding negative bound of dimension
+    :param bound_pos: integer holding positive bound of dimension
+
+    """
+
     bound_neg: int
     bound_pos: int
 
@@ -52,6 +71,12 @@ class LatticeBounds:
 class VoxelData(DataGeneric):
     """
     Data type to hold Voxels
+
+    :param resolution: holds type VoxelResolution which holds a float representing the voxel's resolution
+    :param x_bounds: bounds in x direction held in a LatticeBounds object
+    :param y_bounds: bounds in y direction held in a LatticeBounds object
+    :param z_bounds: bounds in z direction held in a LatticeBounds object
+    :param dimensions: holds dimensions of voxel in ThreeDimensionalLattice object
     """
     resolution: VoxelResolution
     x_bounds: LatticeBounds
@@ -79,16 +104,23 @@ class FileGeneric(abc.ABC):
     @abc.abstractmethod
     def write(data: DataGeneric) -> None:
         """
+        Writes data to a file of class type.
+
+        :param data: Data to be written to file
 
         """
         raise NotImplementedError
 
     @staticmethod
     @abc.abstractmethod
-    def load(filename: Path, label: int) -> DataGeneric:
+    def load(file: Path, label: int) -> DataGeneric:
         """
         Loads data into an object of type Data
-        :return: Data
+
+        :param file: file to be loaded of type Path
+        :param label: label for the given data. (What class does this data belong to).
+
+        :return: Data that was loaded
         """
         raise NotImplementedError
 
@@ -103,6 +135,9 @@ class CNNFile(FileGeneric):
         """
             Method is responsible for generating cnn file based on VoxelData.values that's been sorted
             from largest to smallest.
+
+            :param data: voxel data to be written into a CNN file.
+
             :return: None
             """
         with open(VoxelData.filepath.name, 'w') as cnn_file:
@@ -161,6 +196,10 @@ class CNNFile(FileGeneric):
     def load(file: Path, label: int) -> VoxelData:
         """
         Loads voxel data and associated information into a voxelData object and returns it
+
+        :param file: file to be loaded of type Path
+        :param label: label for the given data. (What class does this data belong to).
+
         :return: VoxelData
         """
         try:
