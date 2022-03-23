@@ -20,11 +20,14 @@ class Model(abc.ABC):
     """
     Class is an abstract class providing structure on how models should be made. Models must contain a way to
     """
-    model: object
+    model: object = dataclasses.field(default=None)
 
     @abc.abstractmethod
     def create_model(self, *args) -> None:
         """
+        Responsible for creating the model of a given class
+
+        :param args: Arguments needed for creating a given model
 
         """
         raise NotImplementedError
@@ -33,20 +36,23 @@ class Model(abc.ABC):
     def evaluate(self, test_data: [DataGeneric], *args) -> list:
         """
 
+        :param test_data: list of data to be used for evaluation of model.
+        :param args: any other arguments that would be needed.
+
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def load_model(self, filename: str) -> None:
         """
+        loads
 
         """
         raise NotImplementedError
 
 
 class CNNModel(abc.ABC):
-
-    model: Sequential
+    model: Sequential = dataclasses.field(default=None)
 
     @abc.abstractmethod
     def train(self, train_data: [DataGeneric], *args) -> None:
@@ -61,18 +67,19 @@ class ElectrostaticsModel(CNNModel, Model):
     Model is responsible for electrostatic voxel data.
     """
 
-    def __init__(self):
-        self.model: Sequential
-
-    def create_model(self, x_dim_size: int, y_dim_size: int, z_dim_size:int) -> None:
+    def create_model(self, x_dim_size: int, y_dim_size: int, z_dim_size: int, *args) -> None:
         """
+        Create model
+
+        :param x_dim_size: dimension size in x direction.
+        :param y_dim_size: dimension size in y direction.
+        :param z_dim_size: dimension size in z direction.
 
         """
         if self.model is not None:
             logger.info("Model has already been created.")
-            return
-        else:
-            self.model = Sequential()
+            return None
+        self.model = Sequential()
         logger.info("Creating model")
         self.model.add(layers.Conv3D(64,
                                      kernel_size=(5, 5, 5),
@@ -98,8 +105,15 @@ class ElectrostaticsModel(CNNModel, Model):
         logger.info("Created model")
 
     def train(self, training_files: [VoxelData], batch_size: int = 256,
-              epochs: int = 10, validation_split: float = .2, verbose: int = 2) -> None:
+              epochs: int = 10, validation_split: float = .2, verbose: int = 2, *args) -> None:
         """
+        Trains the CNN with the given data and allows tuning of how the training is performed.
+
+        :param training_files: list of data to be parsed for training
+        :param batch_size: the batch size for training
+        :param epochs: number of epochs for training
+        :param validation_split: validation split for training
+        :param verbose: verbosity of model training
 
         """
         train_data = [x.values for x in training_files]
@@ -112,6 +126,12 @@ class ElectrostaticsModel(CNNModel, Model):
 
     def evaluate(self, test_files: [VoxelData], verbose=2) -> list:
         """
+        Method evaluates test data and returns a list of the results
+
+        :param test_files: list of data to be used for testing model
+        :param verbose: verbosity of data.
+
+        :return: A list of the resulting predictions( scores array)
 
         """
         test_data = [x.values for x in test_files]
@@ -123,6 +143,8 @@ class ElectrostaticsModel(CNNModel, Model):
 
     def load_model(self, filename: Path) -> None:
         """
+        Loads a previously trained model
 
         """
+        # TODO: Need to add error handling for a wrong file type fed to this method
         self.model = load_model(filename.stem)

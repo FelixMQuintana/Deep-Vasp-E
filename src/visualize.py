@@ -91,8 +91,8 @@ class VoxelGradCam(VisualizationGeneric, NeuralNetwork):
         alpha = alpha_num / alpha_denominator
         weights = np.sum(alpha * np.maximum(first, 0.0), axis=(0, 1, 2))
         values = np.zeros(shape=(data.dimensions.x_dim, data.dimensions.y_dim, data.dimensions.z_dim))
-        for index, w in enumerate(weights):
-            values += w * outputs[:, :, :, index]
+        for index, weight in enumerate(weights):
+            values += weight * outputs[:, :, :, index]
 
         self.visual_data = VoxelData(filepath=Path('/DeepVasp-E/VoxelGradCam.CNN'), label_index=data.label_index,
                                      values=values, resolution=data.resolution, x_bounds=data.x_bounds,
