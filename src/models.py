@@ -4,6 +4,9 @@ Module is responsible for holding different types of models that this project ca
 import abc
 import dataclasses
 from pathlib import Path
+from typing import Optional
+import numpy
+
 from src.load import DataGeneric, VoxelData
 from logging import getLogger
 from tensorflow.keras.models import load_model
@@ -11,6 +14,7 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 from tensorflow.keras import losses
+
 
 logger = getLogger(__name__)
 
@@ -62,10 +66,14 @@ class CNNModel(abc.ABC):
         raise NotImplementedError
 
 
+@dataclasses.dataclass
 class ElectrostaticsModel(CNNModel, Model):
     """
     Model is responsible for electrostatic voxel data.
     """
+    x_dim: Optional[int] = dataclasses.field(default=None)
+    y_dim: Optional[int] = dataclasses.field(default=None)
+    z_dim: Optional[int] = dataclasses.field(default=None)
 
     def create_model(self, x_dim_size: int, y_dim_size: int, z_dim_size: int, *args) -> None:
         """
@@ -79,6 +87,9 @@ class ElectrostaticsModel(CNNModel, Model):
         if self.model is not None:
             logger.info("Model has already been created.")
             return None
+        self.x_dim = x_dim_size
+        self.y_dim = y_dim_size
+        self.z_dim = z_dim_size
         self.model = Sequential()
         logger.info("Creating model")
         self.model.add(layers.Conv3D(64,
@@ -116,8 +127,10 @@ class ElectrostaticsModel(CNNModel, Model):
         :param verbose: verbosity of model training
 
         """
-        train_data = [x.values for x in training_files]
-        labels = [x.label_index for x in training_files]
+        train_data = numpy.empty(shape=(len(training_files), self.x_dim, self.y_dim, self.z_dim, 1))
+        for i in range(0, len(training_files)):
+            train_data[i] = training_files[i].values
+        labels = numpy.array([x.label_index for x in training_files])
         logger.info("Beginning training")
         self.model.fit(x=train_data,
                        y=labels,
@@ -148,3 +161,5 @@ class ElectrostaticsModel(CNNModel, Model):
         """
         # TODO: Need to add error handling for a wrong file type fed to this method
         self.model = load_model(filename.stem)
+
+#class ExperementalModel(CNNModel, Model):

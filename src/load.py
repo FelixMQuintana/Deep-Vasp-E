@@ -1,11 +1,14 @@
 """Responsible for loading in data based on types"""
 
 from dataclasses import dataclass
+
+import numpy
 import numpy as np
 import re
 from logging import getLogger
 import abc
 from enum import Enum
+from numpy import load, save
 from pathlib import Path
 
 logger = getLogger(__name__)
@@ -63,8 +66,8 @@ class LatticeBounds:
 
     """
 
-    bound_neg: int
-    bound_pos: int
+    bound_neg: float
+    bound_pos: float
 
 
 @dataclass
@@ -228,13 +231,44 @@ class CNNFile(FileGeneric):
                 data = data.reshape((x_dim, y_dim, z_dim, 1))
                 return VoxelData(filepath=file.absolute(), label_index=label, values=data,
                                  resolution=VoxelResolution(float(resolution_match.group(1))),
-                                 x_bounds=LatticeBounds(int(match_x_bounds.group(1)),
-                                                        int(match_x_bounds.group(2))),
-                                 y_bounds=LatticeBounds(int(match_y_bounds.group(1)),
-                                                        int(match_y_bounds.group(2))),
-                                 z_bounds=LatticeBounds(int(match_z_bounds.group(1)),
-                                                        int(match_z_bounds.group(2))),
+                                 x_bounds=LatticeBounds(float(match_x_bounds.group(1)),
+                                                        float(match_x_bounds.group(2))),
+                                 y_bounds=LatticeBounds(float(match_y_bounds.group(1)),
+                                                        float(match_y_bounds.group(2))),
+                                 z_bounds=LatticeBounds(float(match_z_bounds.group(1)),
+                                                        float(match_z_bounds.group(2))),
                                  dimensions=ThreeDimensionalLattice(x_dim, y_dim, z_dim)
                                  )
         except LoadException as ex:
             LoadException(f"Could not open the file because: {ex}.")
+
+
+class NumpyFile(FileGeneric):
+    """
+    Responsible for writing and loading Numpy Files
+    """
+
+    @staticmethod
+    def write(data: DataGeneric) -> None:
+        """
+        Method is responsible for generating NPY file based on
+        DataGeneric.values.
+
+        :param data:  data to be written into a NPY file.
+
+        :return: None
+        """
+        save(file=data.filepath.name, arr=data.values)
+
+    @staticmethod
+    def load(file: Path, label: int) -> DataGeneric:
+        """
+        Loads information into a NPY object and returns it
+
+        :param file: file to be loaded of type Path
+        :param label: label for the given data. (What class does this data belong to).
+
+        :return: DataGeneric
+        """
+        data: numpy.ndarray = load(file.name)
+        return DataGeneric(file, label, data)

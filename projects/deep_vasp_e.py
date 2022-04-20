@@ -22,7 +22,7 @@ class DataSet:
     set: [VoxelData]
 
 
-class DeepVaspE:
+class DeepVaspE                                                                                                                                                                                                                                                                                                         :
     """
     Class provides how to gather DeepVaspE results
     """
@@ -37,6 +37,10 @@ class DeepVaspE:
 
         :return: None
         """
+        super().__init__()
+       # logging.basicConfig(filename='myapp.log', level=logging.INFO)
+
+     #   self.add_argument()
         if model_file is not None:
             self.load(model_file)
         self._working_directory = working_directory
@@ -78,7 +82,7 @@ class DeepVaspE:
         :return: None
         """
         self._model.train(training_files=self._training.set,
-                          batch_size=256,
+                          batch_size=128,
                           epochs=10,
                           validation_split=0.2,
                           verbose=2)
